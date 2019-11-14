@@ -1,11 +1,10 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.0;
 
 contract ExerciseC6A {
 
     /********************************************************************************************/
     /*                                       DATA VARIABLES                                     */
     /********************************************************************************************/
-
 
     struct UserProfile {
         bool isRegistered;
@@ -15,7 +14,7 @@ contract ExerciseC6A {
     address private contractOwner;                  // Account used to deploy contract
     mapping(address => UserProfile) userProfiles;   // Mapping for storing user profiles
 
-
+    bool private operational = true;
 
     /********************************************************************************************/
     /*                                       EVENT DEFINITIONS                                  */
@@ -27,11 +26,7 @@ contract ExerciseC6A {
     * @dev Constructor
     *      The deploying account becomes contractOwner
     */
-    constructor
-                                (
-                                ) 
-                                public 
-    {
+    constructor() public {
         contractOwner = msg.sender;
     }
 
@@ -45,51 +40,45 @@ contract ExerciseC6A {
     /**
     * @dev Modifier that requires the "ContractOwner" account to be the function caller
     */
-    modifier requireContractOwner()
-    {
+    modifier requireContractOwner() {
         require(msg.sender == contractOwner, "Caller is not contract owner");
         _;
+    }
+
+    modifier requireIsOperational() {
+      require(operational, "Contract is currently not operational");
+      _;
     }
 
     /********************************************************************************************/
     /*                                       UTILITY FUNCTIONS                                  */
     /********************************************************************************************/
-
-   /**
+    
+    /**
     * @dev Check if a user is registered
     *
     * @return A bool that indicates if the user is registered
     */   
-    function isUserRegistered
-                            (
-                                address account
-                            )
-                            external
-                            view
-                            returns(bool)
-    {
+    function isUserRegistered(address account) external view returns(bool) {
         require(account != address(0), "'account' must be a valid address.");
         return userProfiles[account].isRegistered;
+    }
+
+    function isOperational() public view returns(bool) {
+      return operational;
     }
 
     /********************************************************************************************/
     /*                                     SMART CONTRACT FUNCTIONS                             */
     /********************************************************************************************/
-
-    function registerUser
-                                (
-                                    address account,
-                                    bool isAdmin
-                                )
-                                external
-                                requireContractOwner
-    {
+    
+    function registerUser(address account, bool isAdmin) external requireContractOwner requireIsOperational {
         require(!userProfiles[account].isRegistered, "User is already registered.");
+        userProfiles[account] = UserProfile({ isRegistered: true, isAdmin: isAdmin });
+    }
 
-        userProfiles[account] = UserProfile({
-                                                isRegistered: true,
-                                                isAdmin: isAdmin
-                                            });
+    function setOperatingStatus(bool mode) external requireContractOwner {
+      operational = mode;
     }
 }
 
