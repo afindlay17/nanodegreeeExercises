@@ -14,16 +14,10 @@ contract ExerciseC6B {
     /*                                       DATA VARIABLES                                     */
     /********************************************************************************************/
 
-
     address private contractOwner;                  // Account used to deploy contract
 
-
-    constructor
-                (
-                )
-                public 
-    {
-        contractOwner = msg.sender;
+    constructor() public {
+      contractOwner = msg.sender;
     }
    
     /********************************************************************************************/
@@ -36,10 +30,9 @@ contract ExerciseC6B {
     /**
     * @dev Modifier that requires the "ContractOwner" account to be the function caller
     */
-    modifier requireContractOwner()
-    {
-        require(msg.sender == contractOwner, "Caller is not contract owner");
-        _;
+    modifier requireContractOwner() {
+      require(msg.sender == contractOwner, "Caller is not contract owner");
+      _;
     }
 
     /********************************************************************************************/
