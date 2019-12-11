@@ -15,8 +15,8 @@ contract ExerciseC6B {
   constructor() public { }
 
   modifier rateLimit(uint time) {
-    require (block.timestamp >= enabled, "Please wait sufficient time until this function can be called")
-    enabled = enable.add(time);
+    require (block.timestamp >= enabled, "Please wait sufficient time until this function can be called");
+    enabled = enabled.add(time);
     _;
   }
 
@@ -38,12 +38,12 @@ contract ExerciseC6B {
 
     // 2. Effects
     // Reset sales for caller address to zero 
-    uint amount = sales[msg.sender];
-    sales[msg.sender] = sales[msg.sender].sub(amount);
+    uint senderAmount = sales[msg.sender];
+    sales[msg.sender] = sales[msg.sender].sub(senderAmount);
 
     // 3. Interaction
     // Transfer value of sales for caller to caller address
-    msg.sender.transfer(amount);
+    msg.sender.transfer(senderAmount);
   }
  
 }
