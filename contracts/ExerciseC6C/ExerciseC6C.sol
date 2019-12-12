@@ -24,6 +24,7 @@ contract ExerciseC6C {
 
   address private contractOwner;              // Account used to deploy contract
   mapping(string => Profile) employees;      // Mapping for storing employees
+  mapping(address => uint256) authorizedContracts;
 
   /**
   * @dev Constructor
@@ -48,6 +49,11 @@ contract ExerciseC6C {
     _;
   }
 
+  modifier isCallerAuthorized() {
+    require(authorizedContracts[msg.sender] == 1);
+    _;
+  }
+
   /********************************************************************************************/
   /*                                       UTILITY FUNCTIONS                                  */
   /********************************************************************************************/
@@ -64,7 +70,7 @@ contract ExerciseC6C {
   /*                                     SMART CONTRACT FUNCTIONS                             */
   /********************************************************************************************/
 
-  function registerEmployee(string id, bool isAdmin, address wallet) external requireContractOwner {
+  function registerEmployee(string id, bool isAdmin, address wallet) external isCallerAuthorized {
     require(!employees[id].isRegistered, "Employee is already registered.");
 
     employees[id] = Profile({
@@ -81,11 +87,18 @@ contract ExerciseC6C {
     return employees[id].bonus;
   }
 
-  function updateEmployee(string id, uint256 sales, uint256 bonus) external {
+  function updateEmployee(string id, uint256 sales, uint256 bonus) external isCallerAuthorized {
     require(employees[id].isRegistered, "Employee is not registered.");
 
     employees[id].sales = employees[id].sales.add(sales);
     employees[id].bonus = employees[id].bonus.add(bonus);
   }
 
+  function authorizeContract(address contractAddress) external requireContractOwner {
+    authorizedContracts[contractAddress] = 1;
+  }
+
+  function deauthorizeContract(address contractAddress) external requireContractOwner {
+    delete authorizedContracts[contractAddress];
+  }
 }
